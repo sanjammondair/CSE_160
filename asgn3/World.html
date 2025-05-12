@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Change a point color</title>
+
+    <style>
+      canvas {
+        display: block;
+        margin: auto;
+        border: 2px solid #444;
+        background-color: #000;
+      }
+      body {
+        font-family: sans-serif;
+        text-align: center;
+      }
+    </style>
+    
+  </head>
+
+  <body onload="main()">
+    <h1>Creating a Virtual World - Assignment 3</h1>
+    <h2>Sanjam Mondair - smondair@ucsc.edu</h2>
+    <h3>Notes to the grader: All features are implemented. Let me know if I should add anything else!
+
+    </h3>
+    <div style="padding: 10px; font-family: sans-serif; background-color: #f4f4f4; border-radius: 8px; margin-bottom: 15px;">
+      <h2>🧱 Block Stacker</h2>
+      <p><strong>Goal:</strong> Stack 10 blocks on a single spot as fast as you can!</p>
+      <p><strong>How to play:</strong></p>
+      <ul>
+        <li>Press on a block to place the red selector.</li>
+        <li>Press <strong>F</strong> to place a block at the selected spot. you may also press <strong>G</strong> to delete a block.</li>
+        <li>The timer starts when you place the first block.</li>
+        <li>Once the stack hits height 10, the timer stops and shows your total time.</li>
+        <li>Press <strong>R</strong> to reset and play again!</li>
+      </ul>
+    </div>
+    
+    <canvas id="webgl" width="400" height="400">
+    Please use a browser that supports "canvas"
+    </canvas>
+
+    <p id="numdot"> XXX </p>
+   <p>
+
+    <p>
+      Blue <input type="range" min="-45" max="45" value="0" class="slider" id="blueSlide">
+      Animation:
+      <button type="button" id="animationBlueOnButton">ON</button>
+      <button type="button" id="animationBlueOffButton">OFF</button>
+
+    </p>
+
+    <p>
+      Magenta <input type="range" min="-45" max="45" value="0" class="slider" id="magentaSlide">
+      Animation:
+      <button type="button" id="animationMagentaOnButton">ON</button>
+      <button type="button" id="animationMagentaOffButton">OFF</button>
+
+    </p>
+
+    <p>
+      Yellow <input type="range" min="-45" max="45" value="0" class="slider" id="yellowSlide">
+      Animation:
+      <button type="button" id="animationYellowOnButton">ON</button>
+      <button type="button" id="animationYellowOffButton">OFF</button>
+    </p>
+
+    <p>
+      Red <input type="range" min="-45" max="45" value="0" class="slider" id="redSlide">
+      Animation:
+      <button type="button" id="animationRedOnButton">ON</button>
+      <button type="button" id="animationRedOffButton">OFF</button>
+    </p>
+    
+    <p>
+      Camera Angle <input type="range" min="0" max="90" value="5" class="slider" id="angleSlide">
+    </p>
+
+
+    <script src="../lib/webgl-utils.js"></script>
+    <script src="../lib/webgl-debug.js"></script>
+    <script src="../lib/cuon-utils.js"></script>
+    <script src="lib/cuon-matrix.js"></script>
+
+    <script src="Triangle.js"></script>
+    <script src="Circle.js"></script>
+    <script src="Point.js"></script>
+    <script src="Cube.js"></script>
+    <script src="Camera.js"></script>
+    <script src="World.js"></script>
+  </body>
+</html>
