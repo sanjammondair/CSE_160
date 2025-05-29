@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Final Three.js Scene</title>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.176.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.176.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+    #scoreboard {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-family: sans-serif;
+      color: white;
+      background: rgba(0,0,0,0.5);
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+    #infobox {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-family: sans-serif;
+        color: white;
+        background: rgba(0,0,0,0.6);
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 0.9em;
+        line-height: 1.4em;
+        max-width: 200px;
+        }
+
+  </style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="scoreboard">Score: 0</div>
+
+<div id="infobox">
+    <strong>Sanjam Mondair</strong><br>
+    smondair@ucsc.edu<br><br>
+    This scene contains all required components including:<br>
+    - 20+ 3D shapes<br>
+    - Orbit camera & skybox<br>
+    - Textured cube & animated duck<br>
+    - Mini game: Click the red cube and watch your score go up!
+  </div>
+  
+
+<script type="module">
+  import * as THREE from 'three';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+  import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({ canvas });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.set(0, 2, 10);
+  const controls = new OrbitControls(camera, renderer.domElement);
+
+  // Skybox
+  const cubeTexLoader = new THREE.CubeTextureLoader();
+  scene.background = cubeTexLoader.load([
+    'resources/skybox/bridge/px.jpg',
+    'resources/skybox/bridge/nx.jpg',
+    'resources/skybox/bridge/py.jpg',
+    'resources/skybox/bridge/ny.jpg',
+    'resources/skybox/bridge/pz.jpg',
+    'resources/skybox/bridge/nz.jpg',
+  ]);
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+  const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
+  dirLight.position.set(5, 10, 7.5);
+  scene.add(dirLight);
+  const pointLight = new THREE.PointLight(0xffaa00, 1, 100);
+  pointLight.position.set(-5, 5, 5);
+  scene.add(pointLight);
+
+  // Load duck model (larger and closer with spotlight)
+ // Load duck model (BIG, centered, spotlighted)
+const gltfLoader = new GLTFLoader();
+gltfLoader.load('resources/models/duck.glb', (gltf) => {
+  const duck = gltf.scene;
+  duck.position.set(0, 1.5, 2);       // Lift off ground and center
+  duck.scale.set(0.25, 0.25, 0.25);  // MASSIVE duck
+  scene.add(duck);
+
+  // Bright yellow spotlight from above
+  const duckLight = new THREE.SpotLight(0xffff00, 3, 20, Math.PI / 5, 0.5);
+  duckLight.position.set(0, 8, 2);
+  duckLight.target = duck;
+  scene.add(duckLight);
+
+  // Optional glow effect — add a PointLight to make it pop
+  const glow = new THREE.PointLight(0xffcc00, 1, 5);
+  glow.position.set(0, 2, 2);
+  scene.add(glow);
+});
+
+
+  // Textured brick cube (larger, lifted, visible)
+  const texture = new THREE.TextureLoader().load('resources/brick.jpg');
+  const texMat = new THREE.MeshPhongMaterial({ map: texture });
+  const texCube = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), texMat);
+  texCube.position.set(-4, 1, 0);
+  scene.add(texCube);
+
+  // Primary shapes (generate 20+)
+  const shapes = [];
+  const geometries = [
+    new THREE.BoxGeometry(),
+    new THREE.SphereGeometry(0.5),
+    new THREE.CylinderGeometry(0.5, 0.5, 1),
+    new THREE.ConeGeometry(0.5, 1, 16)
+  ];
+
+  for (let i = 0; i < 20; i++) {
+    const geometry = geometries[Math.floor(Math.random() * geometries.length)];
+    const material = new THREE.MeshPhongMaterial({ color: Math.random() * 0xffffff });
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set((Math.random() - 0.5) * 20, 0, (Math.random() - 0.5) * 20);
+    scene.add(mesh);
+    shapes.push(mesh);
+  }
+
+  // Game cube (click to score)
+  const gameCube = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 1, 1),
+    new THREE.MeshPhongMaterial({ color: 0xff0000 })
+  );
+  gameCube.position.set(0, 1, 0);
+  scene.add(gameCube);
+
+  // Scoreboard
+  let score = 0;
+  const scoreboard = document.getElementById("scoreboard");
+
+  
+
+  // Raycaster for game
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+
+  window.addEventListener('click', (event) => {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObject(gameCube);
+
+    if (intersects.length > 0) {
+      score++;
+      scoreboard.textContent = `Score: ${score}`;
+      gameCube.visible = false;
+      setTimeout(() => {
+        gameCube.position.set((Math.random() - 0.5) * 10, 1, (Math.random() - 0.5) * 10);
+        gameCube.visible = true;
+      }, 1000);
+    }
+  });
+
+  // Animate
+  function animate(time) {
+    time *= 0.001;
+    gameCube.rotation.x = time;
+    gameCube.rotation.y = time;
+    texCube.rotation.y += 0.01; // make brick texture more visible
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+</script>
+</body>
+</html>
